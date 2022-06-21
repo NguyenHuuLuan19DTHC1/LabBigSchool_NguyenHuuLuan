@@ -1,11 +1,16 @@
-﻿@model IEnumerable<LabBigSchool_NguyenHuuLuan.Models.Course>
+﻿@model LabBigSchool_NguyenHuuLuan.ViewModels.CoursesViewModel
+@using Microsoft.AspNet.Identity;
+@using System.Data.Entity;
+@using LabBigSchool_NguyenHuuLuan.Models;
+
+
 @{
     ViewBag.Title = "Home Page";
 }
 
 <div class="row">
     <ul class="course" @*style="list-style: none;margin-top: 0.5cm"*@>
-        @foreach (var course in Model)
+        @foreach (var course in Model.UpcommingCourses)
         {
             <li @*style="position: relative; margin-bottom: 30px;"*@>
                 <div class="date" @*style=" text-align: center; background-color: #d41d50; color: white; width: 60px; border-radius: 8px;"*@>
@@ -19,14 +24,72 @@
                 <div class="details" @*style="position: absolute; top: 0; left: 70px;"*@>
                     <span class="lecturer">
                         @course.Lecturer.Name
+
+
+                            <button class="btn btn-default btn-sm js-tongle-follow" data-user-id="@course.LecturerId">Follow</button>
+
                     </span>
                     <span class="category">
+                        <br />
                         @course.Category.Name
                     </span>
+                    @if (Model.ShowAction)
+                    {
+                        var User_ID = @User.Identity.GetUserId();
+                        ApplicationDbContext _dbContext = new ApplicationDbContext();
+                        bool isGoing = _dbContext.Attendances.Any(a => a.CourseId == course.Id && a.AttendaneeId == User_ID);
+
+
+                        <div>
+                            @if (!isGoing)
+                            {
+                                <button class="btn btn-default btn-sm js-tongle-attendance" data-course-id="@course.Id">Going?</button>
+
+                            }
+                            else
+                            {
+                                <span class="text-danger">Đã tham gia</span>
+                            }
+                        </div>
+                    }
+
+
                 </div>
 
             </li>
         }
 
     </ul>
+    @section scripts
+{
+        <script>
+            $(document).ready(function () {
+                $('.js-tongle-attendance').click(function (e) {
+                    var button = $(e.target);
+                    $.post("/api/Attendances", { courseId: button.attr("data-course-id") })
+                        .done(function () {
+                            button
+                                .removeClass("btn-default")
+                                .addClass("btn-info")
+                                .text("Going");
+                        })
+                        .fail(function () {
+                            alert("Something failed!");
+                        });
+
+                });
+                $('.js-tongle-follow').click(function (e) {
+                    var button = $(e.target);
+                    $.post("/api/Followings", { followeeId: button.attr("data-user-id") })
+                        .done(function () {
+                            button.text("Following");
+                        })
+                        .fail(function () {
+                            alert("Something failed");
+                        });
+                });
+            });
+        </script>
+    }
 </div>
+

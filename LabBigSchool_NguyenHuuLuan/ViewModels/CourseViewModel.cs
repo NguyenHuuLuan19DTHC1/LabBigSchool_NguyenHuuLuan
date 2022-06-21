@@ -12,6 +12,7 @@ namespace LabBigSchool_NguyenHuuLuan.ViewModels
     {
         string a= "dd/M/yyyy";
         string b = "HH:mm";
+        public int Id { get; set; }
 
         [Required]
         public string Place { get; set; }
@@ -27,6 +28,11 @@ namespace LabBigSchool_NguyenHuuLuan.ViewModels
         public DateTime GetDateTime()
         {
             return DateTime.ParseExact(string.Format("{0} {1}", Date, Time),string.Format("{0} {1}",a,b), CultureInfo.InvariantCulture);
+        }
+        public string Heading { get; set; }
+        public string Action
+        {
+            get { return (Id != 0) ? "Update" : "Create"; }
         }
     }
 }
