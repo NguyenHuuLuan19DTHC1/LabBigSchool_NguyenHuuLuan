@@ -24,9 +24,11 @@
                 <div class="details" @*style="position: absolute; top: 0; left: 70px;"*@>
                     <span class="lecturer">
                         @course.Lecturer.Name
-
-
+                        @if (Model.ShowAction)
+                        {
                             <button class="btn btn-default btn-sm js-tongle-follow" data-user-id="@course.LecturerId">Follow</button>
+                        }
+
 
                     </span>
                     <span class="category">
